@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useProductContext } from '../context/ProductContext';
 
 interface ProductType {
   id: number;
@@ -20,10 +22,18 @@ const ProductItem = ({ product, onDelete, onUpdate }: ProductItemProps) => {
   const [editExplanation, setEditExplanation] = useState(product.explanation);
   const [editPrice, setEditPrice] = useState(product.price);
 
+  useEffect(() => {
+    fetch('/product')
+    .then((response) => response.json())
+    .then((data) => setProducts(data.products));
+  }, []);
+
   return (
     <div>
       <div>{id}</div>
-      <div>{name}</div>
+      <div>
+        <Link to={`/${id}`}>{name}</Link>
+      </div>
       <div>{price}</div>
       <div>{explanation}</div>
 
@@ -73,14 +83,7 @@ const ProductItem = ({ product, onDelete, onUpdate }: ProductItemProps) => {
 };
 
 function HomePage() {
-  const [products, setProducts] = useState<ProductType[]>([
-    {
-      id: 0,
-      name: 'notebook',
-      explanation: '노트북',
-      price: 200,
-    },
-  ]);
+  const [products, setProducts] = useProductContext();
 
   // const products: ProductType[] = [
   //   {
@@ -96,7 +99,7 @@ function HomePage() {
   const [price, setPrice] = useState(0); // number
   const productId = useRef(0); // number
 
-  const fakeId = useRef(0);
+  // const fakeId = useRef(0);
   const handleCreate = (newProduct: Omit<ProductType, 'id'>) => {
     productId.current += 1;
     setProducts([
